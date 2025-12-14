@@ -36,3 +36,18 @@ def buscar_livro(id):
         if livro["id"] == id:
             return jsonify(livro)
     return jsonify({"erro": "Livro não encontrado"}), 404
+
+
+
+@app.route("/livros/<int:id>", methods=["PUT"])
+def atualizar_livro(id):
+    dados = request.json
+
+    for livro in livros:
+        if livro["id"] == id:
+            livro["titulo"] = dados.get("titulo", livro["titulo"])
+            livro["autor"] = dados.get("autor", livro["autor"])
+            livro["ano"] = dados.get("ano", livro["ano"])
+            return jsonify(livro)
+
+    return jsonify({"erro": "Livro não encontrado"}), 404
