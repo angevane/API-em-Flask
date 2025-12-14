@@ -27,3 +27,12 @@ def criar_livro():
 @app.route("/livros", methods=["GET"])
 def listar_livros():
     return jsonify(livros)
+
+
+
+@app.route("/livros/<int:id>", methods=["GET"])
+def buscar_livro(id):
+    for livro in livros:
+        if livro["id"] == id:
+            return jsonify(livro)
+    return jsonify({"erro": "Livro não encontrado"}), 404
