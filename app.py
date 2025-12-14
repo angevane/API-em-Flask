@@ -22,3 +22,8 @@ def criar_livro():
     contador_id += 1
 
     return jsonify(livro), 201
+
+
+@app.route("/livros", methods=["GET"])
+def listar_livros():
+    return jsonify(livros)
