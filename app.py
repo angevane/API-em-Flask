@@ -1,10 +1,7 @@
-from flask import Flask, jsonify
+from flask import Flask, jsonify, request
 
 app = Flask(__name__)
 
-@app.route("/")
-def home():
-    return jsonify({"mensagem": "API de Gestão de Livros ativa!"})
+livros = []
+contador_id = 1
 
-if __name__ == "__main__":
-    app.run(debug=True)
