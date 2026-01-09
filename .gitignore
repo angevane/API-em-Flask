@@ -1,25 +1,20 @@
 # Ambiente virtual
 venv/
-.env/
+.env
 
 # Cache do Python
 __pycache__/
 *.pyc
+*.pyo
 
-# Configurações do VS Code
+# Configurações locais
+.flaskenv
+
+# IDE / Editor
 .vscode/
-
-# Logs
-*.log
+.idea/
 
 # Sistema operacional
 .DS_Store
 Thumbs.db
 
-
-#Nova atualização flask1
-venv/
-__pycache__/
-*.pyc
-.env
-.flaskenv
