@@ -15,3 +15,11 @@ __pycache__/
 # Sistema operacional
 .DS_Store
 Thumbs.db
+
+
+#Nova atualização flask1
+venv/
+__pycache__/
+*.pyc
+.env
+.flaskenv

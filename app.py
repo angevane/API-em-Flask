@@ -1,103 +1,84 @@
 from flask import Flask, jsonify, request
+from flask_smorest import abort
+import uuid
+
+from db import livros
 
 app = Flask(__name__)
 
-# "Banco de dados" em memória
-livros = []
-contador_id = 1
+# =========================
+# GET /livros
+# =========================
+@app.get('/livros')
+def listar_livros():
+    return jsonify({"Livros": list(livros.values())}), 200
 
 
 # =========================
-# ROTA INICIAL
+# GET /livro/<id>
 # =========================
-@app.route("/", methods=["GET"])
-def home():
-    return jsonify({
-        "mensagem": "API RESTful de Gestão de Livros",
-        "rotas": {
-            "GET /livros": "Listar todos os livros",
-            "GET /livros/<id>": "Buscar livro por ID",
-            "POST /livros": "Cadastrar novo livro",
-            "PUT /livros/<id>": "Atualizar livro",
-            "DELETE /livros/<id>": "Excluir livro"
-        }
-    })
+@app.get('/livro/<string:id_livro>')
+def buscar_livro_por_id(id_livro):
+    try:
+        return jsonify(livros[id_livro]), 200
+    except KeyError:
+        abort(404, message="Livro não encontrado.")
 
 
 # =========================
-# CREATE — criar livro
+# GET /livro?titulo=XPTO
 # =========================
-@app.route("/livros", methods=["POST"])
+@app.get('/livro')
+def buscar_livro_por_titulo():
+    titulo = request.args['titulo']
+
+    for livro in livros.values():
+        if livro['titulo'] == titulo:
+            return jsonify(livro), 200
+
+    abort(404, message="Livro não encontrado.")
+
+
+# =========================
+# POST /livro
+# =========================
+@app.post('/livro')
 def criar_livro():
-    global contador_id
-    dados = request.json
+    dados = request.get_json()
+    livro_id = uuid.uuid4().hex
 
-    livro = {
-        "id": contador_id,
-        "titulo": dados["titulo"],
-        "autor": dados["autor"],
-        "ano": dados["ano"]
+    livro_novo = {
+        **dados,
+        "id": livro_id
     }
 
-    livros.append(livro)
-    contador_id += 1
+    livros[livro_id] = livro_novo
 
-    return jsonify(livro), 201
-
-
-# =========================
-# READ — listar todos
-# =========================
-@app.route("/livros", methods=["GET"])
-def listar_livros():
-    return jsonify(livros)
+    return jsonify(livro_novo), 201
 
 
 # =========================
-# READ — buscar por ID
+# PUT /livro/<id>
 # =========================
-@app.route("/livros/<int:id>", methods=["GET"])
-def buscar_livro(id):
-    for livro in livros:
-        if livro["id"] == id:
-            return jsonify(livro)
+@app.put('/livro/<string:id_livro>')
+def atualizar_livro(id_livro):
+    dados_novos = request.get_json()
 
-    return jsonify({"erro": "Livro não encontrado"}), 404
+    for livro in livros.values():
+        if livro['id'] == id_livro:
+            livro.update(dados_novos)
+            return jsonify({"livro atualizado": livro}), 200
 
-
-# =========================
-# UPDATE — atualizar livro
-# =========================
-@app.route("/livros/<int:id>", methods=["PUT"])
-def atualizar_livro(id):
-    dados = request.json
-
-    for livro in livros:
-        if livro["id"] == id:
-            livro["titulo"] = dados.get("titulo", livro["titulo"])
-            livro["autor"] = dados.get("autor", livro["autor"])
-            livro["ano"] = dados.get("ano", livro["ano"])
-
-            return jsonify(livro)
-
-    return jsonify({"erro": "Livro não encontrado"}), 404
+    abort(404, message="Livro não encontrado.")
 
 
 # =========================
-# DELETE — excluir livro
+# DELETE /livro/<id>
 # =========================
-@app.route("/livros/<int:id>", methods=["DELETE"])
-def deletar_livro(id):
-    for livro in livros:
-        if livro["id"] == id:
-            livros.remove(livro)
-            return jsonify({"mensagem": "Livro removido com sucesso"})
-
-    return jsonify({"erro": "Livro não encontrado"}), 404
-
-
-# =========================
-# EXECUÇÃO
-# =========================
-if __name__ == "__main__":
-    app.run(debug=True)
+@app.delete('/livro/<string:id_livro>')
+def deletar_livro(id_livro):
+    try:
+        livros.pop(id_livro)
+        return jsonify({"message": "Livro removido com sucesso"}), 200
+    except KeyError:
+        abort(404, message="Livro não encontrado.")
