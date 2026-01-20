@@ -1,4 +1,12 @@
+<<<<<<< HEAD
 flask
 flask-smorest
 flask-sqlalchemy
 marshmallow
+=======
+Flask
+flask-smorest
+marshmallow
+
+
+>>>>>>> ccb12733f5a82dc6e2fd4c32b13cd2eea9f63036
